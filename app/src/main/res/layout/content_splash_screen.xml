@@ -1,27 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:background="#000" android:orientation="vertical">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#52B6FF"
+    android:orientation="vertical"
+    android:scrollbarThumbHorizontal="@color/colorAccent">
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Versão Beta"
+        android:textAppearance="@style/TextAppearance.AppCompat.Small"
         android:textColor="#fff"
         android:textSize="30dp" />
 
     <ImageView
         android:layout_width="430dp"
-        android:layout_height="378dp"
+        android:layout_height="298dp"
         android:layout_gravity="center"
         android:layout_marginTop="150dp"
         android:src="@drawable/parque_logo" />
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="296dp"
         android:gravity="center"
-        android:text="Agendamento Parque da Cidade"
-        android:textColor="#fff"
-        android:textSize="30dp" />
+        android:text="Versão Beta"
+        android:textColor="#FF6D6D"
+        android:textSize="14sp" />
 
 </LinearLayout>

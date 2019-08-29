@@ -2,6 +2,7 @@ package com.thiagoalves;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -9,15 +10,24 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.github.nkzawa.socketio.client.IO;
 import com.github.nkzawa.socketio.client.Socket;
+import com.google.android.gms.ads.AdListener;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.InterstitialAd;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,19 +41,40 @@ public class Agendamento extends AppCompatActivity {
         ArrayAdapter<String> adapter3;
         Spinner data;
         Spinner hora;
+        Spinner quadraSpinner;
         int positionEscolhido2 = -1;
         int positionEscolhido = -1;
         int quadra;
+
         EditText nome;
         EditText cpf;
         private AdView mAdView;
-
+    String link = "";
+    private InterstitialAd mInterstitialAd;
 
 
         @Override
         protected void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             setContentView(R.layout.activity_agendamento);
+            FirebaseApp.initializeApp(this);
+
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("url")
+                    .get()
+                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (QueryDocumentSnapshot document : task.getResult()) {
+                                    link = document.getData().get("link").toString();
+                                    Log.d("firethiago", document.getData().get("link").toString());
+                                }
+                            } else {
+                                Log.w("firethiago", "Error getting documents.", task.getException());
+                            }
+                        }
+                    });
 
             MobileAds.initialize(this, new OnInitializationCompleteListener() {
                 @Override
@@ -51,28 +82,35 @@ public class Agendamento extends AppCompatActivity {
                 }
             });
 
-            mAdView = findViewById(R.id.adView);
-            AdRequest adRequest = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest);
+            mInterstitialAd = new InterstitialAd(this);
+            mInterstitialAd.setAdUnitId("ca-app-pub-3940256099942544/1033173712");
+            mInterstitialAd.loadAd(new AdRequest.Builder().build());
+            mInterstitialAd.setAdListener(new AdListener() {
+                @Override
+                public void onAdClosed() {
+                    mInterstitialAd.loadAd(new AdRequest.Builder().build());
+                }
+            });
 
+            mAdView = findViewById(R.id.adView);
+            mAdView.loadAd(new AdRequest.Builder().build());
 
             mAdView = findViewById(R.id.adView2);
-            AdRequest adRequest2 = new AdRequest.Builder().build();
-            mAdView.loadAd(adRequest2);
-            //ca-app-pub-4653575622321119/3652199197
-
+            mAdView.loadAd(new AdRequest.Builder().build());
 
 
             nome = findViewById(R.id.nome);
             cpf = findViewById(R.id.cpf);
-            Spinner quadra = findViewById(R.id.quadra);
+            quadraSpinner = findViewById(R.id.quadra);
             data = findViewById(R.id.spinner2);
             hora = findViewById(R.id.spinner3);
 
             final String array_spinner[];
-            array_spinner=new String[2];
+            array_spinner=new String[4];
             array_spinner[0]="Quadra 1";
             array_spinner[1]="Quadra 2";
+            array_spinner[2]="Quadra de tênis";
+            array_spinner[3]="Campo Society";
 
             String array_spinner2[] = new String[1];
             array_spinner2[0]="Carregando...";
@@ -84,7 +122,7 @@ public class Agendamento extends AppCompatActivity {
 
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
                     android.R.layout.simple_spinner_item, array_spinner);
-            quadra.setAdapter(adapter);
+            quadraSpinner.setAdapter(adapter);
 
             adapter2 = new ArrayAdapter<>(this,
                     android.R.layout.simple_spinner_item, array_spinner2);
@@ -96,7 +134,7 @@ public class Agendamento extends AppCompatActivity {
 
             hora.setAdapter(adapter3);
 
-            quadra.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            quadraSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
 
@@ -149,12 +187,17 @@ public class Agendamento extends AppCompatActivity {
                                        public void onClick(View v) {
                                            try {
 
-                                               Socket socket = IO.socket("http://adf57058.ngrok.io");
+
+                                               Socket socket = IO.socket(link);
                                                socket.connect();
-                                               socket.emit("join",nome.getText().toString(), cpf.getText().toString(), positionEscolhido, hora.getSelectedItemPosition());
-                                           } catch (
-                                                   URISyntaxException e) {
-                                               e.printStackTrace();
+                                               socket.emit("join",nome.getText().toString(), cpf.getText().toString(), positionEscolhido, hora.getSelectedItemPosition(),quadraSpinner.getSelectedItemPosition() +3 );
+
+                                               if (mInterstitialAd.isLoaded()) {
+                                                   mInterstitialAd.show();
+                                               }
+
+                                               //socket.disconnect();
+                                           } catch (Exception e) {
                                            }
                                        }
                                    }
@@ -174,10 +217,16 @@ public class Agendamento extends AppCompatActivity {
                 quadra = 19;
                 this.quadra = 19;
 
-            } else {
+            } else if(quadra == 1){
                 quadra = 20;
                 this.quadra = 20;
 
+            } else if(quadra == 2){
+                quadra = 21;
+                this.quadra = 21;
+            }else if(quadra == 3){
+                quadra = 22;
+                this.quadra = 22;
             }
             RequestTask a = new RequestTask();
             AsyncTask<String, String, String> retorno = a.execute("http://agendamento.serra.es.gov.br/api/servicos/"+ quadra +"/unidades/45");

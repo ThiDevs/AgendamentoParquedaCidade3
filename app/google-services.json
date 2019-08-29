@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "588180317900",
+    "firebase_url": "https://agendamento-parque-da-cidade.firebaseio.com",
+    "project_id": "agendamento-parque-da-cidade",
+    "storage_bucket": "agendamento-parque-da-cidade.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:588180317900:android:a4653a6b88f7b0f6",
+        "android_client_info": {
+          "package_name": "com.thiagoalves"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "588180317900-ehom4ti6jjsaidom3q09suf1582aof8m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4GhKNsIZfCpUFwbqEQRmWHQ9GIeKbGS8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "588180317900-ehom4ti6jjsaidom3q09suf1582aof8m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

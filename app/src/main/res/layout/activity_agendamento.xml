@@ -57,7 +57,7 @@
         android:layout_height="50dp"
         android:layout_marginBottom="12dp"
         android:ems="10"
-        android:hint="CPF"
+        android:hint="CPF apenas numeros"
         android:inputType="textPersonName"
         app:layout_constraintBottom_toTopOf="@+id/quadra"
         app:layout_constraintEnd_toEndOf="@+id/quadra"

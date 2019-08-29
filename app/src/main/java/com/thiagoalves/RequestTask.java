@@ -30,7 +30,7 @@ class RequestTask extends AsyncTask<String, String, String> {
                     responseString = s.hasNext() ? s.next() : "";
 
 
-                }
+                } catch (Exception e){}
                 finally {
                     urlConnection.disconnect();
                 }
@@ -41,7 +41,6 @@ class RequestTask extends AsyncTask<String, String, String> {
                 String response = "FAILED"; // See documentation for more info on response handling
             }
         } catch (Exception e) {
-            e.printStackTrace();
 
             //TODO Handle problems..
         }
